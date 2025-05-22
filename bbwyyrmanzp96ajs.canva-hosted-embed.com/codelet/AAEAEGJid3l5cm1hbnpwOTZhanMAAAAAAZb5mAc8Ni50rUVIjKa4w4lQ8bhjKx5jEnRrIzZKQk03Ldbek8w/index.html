@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FASTPLAYER - Sua Plataforma de IPTV</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        :root {
+            --netflix-red: #E50914;
+            --netflix-black: #141414;
+            --netflix-dark: #000000;
+            --netflix-light: #F5F5F1;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--netflix-black);
+            color: var(--netflix-light);
+        }
+
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(20, 20, 20, 1) 100%), url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAxMDAwIDUwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzE0MTQxNCIvPjwvc3ZnPg==');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .action-button {
+            background: var(--netflix-red);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .action-button:hover {
+            background: #f40612;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(229, 9, 20, 0.5);
+        }
+
+        .secondary-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 24px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .secondary-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .feature-card {
+            background: rgba(20, 20, 20, 0.7);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .pricing-card {
+            background: rgba(20, 20, 20, 0.7);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .pricing-card.popular {
+            border: 2px solid var(--netflix-red);
+        }
+
+        .demo-card {
+            background: rgba(20, 20, 20, 0.7);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .channel-logo {
+            width: 60px;
+            height: 60px;
+            background-color: #fff;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            overflow: hidden;
+        }
+
+        .channel-logo svg {
+            width: 80%;
+            height: 80%;
+        }
+
+        /* Contador animado */
+
+        .counter {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--netflix-red);
+        }
+
+        /* Animação para o ícone ao vivo */
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--netflix-red);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            animation: blink 1s infinite;
+        }
+
+        /* Animação para o contador */
+
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-count {
+            animation: countUp 0.5s ease-out forwards;
+        }
+
+        /* Estilo para o player de vídeo */
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            /* 16:9 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 4px;
+            background: #000;
+        }
+
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 4px;
+            object-fit: cover;
+        }
+
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 15px;
+        }
+
+        .channel-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(20, 20, 20, 0.7);
+            border-radius: 4px;
+            padding: 15px 10px;
+            transition: all 0.3s ease;
+        }
+
+        .channel-item:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 30, 30, 0.7);
+        }
+
+        /* Estilos para depoimentos */
+
+        .testimonial-card {
+            background: rgba(20, 20, 20, 0.7);
+            border-radius: 4px;
+            padding: 20px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            height: 100%;
+        }
+
+        .testimonial-card::before {
+            content: '"';
+            font-size: 4rem;
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            color: rgba(229, 9, 20, 0.2);
+            font-family: serif;
+        }
+
+        .testimonial-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            overflow: hidden;
+        }
+
+        /* Slider para depoimentos */
+
+        .testimonial-slider {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .testimonial-slides {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .testimonial-slide {
+            min-width: 100%;
+            padding: 0 15px;
+        }
+
+        .slider-dots {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 0 5px;
+            cursor: pointer;
+        }
+
+        .slider-dot.active {
+            background: var(--netflix-red);
+        }
+
+        /* Netflix style content rows */
+
+        .content-row {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .content-row-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-left: 20px;
+        }
+
+        .content-slider {
+            display: flex;
+            overflow-x: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .content-slider::-webkit-scrollbar {
+            display: none;
+        }
+
+        .content-item {
+            min-width: 250px;
+            margin-right: 10px;
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .content-item:hover {
+            transform: scale(1.05);
+        }
+
+        .content-item img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+        }
+
+        .content-item-title {
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            font-size: 0.9rem;
+        }
+
+        /* Netflix style navbar */
+
+        .netflix-navbar {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 100%);
+            transition: background 0.3s ease;
+        }
+
+        .netflix-navbar.scrolled {
+            background: var(--netflix-black);
+        }
+
+        .netflix-logo {
+            color: var(--netflix-red);
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        /* Video overlay */
+
+        .video-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+            color: white;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-container:hover .video-overlay {
+            opacity: 1;
+        }
+
+        /* Video controls */
+
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .video-container:hover .video-controls {
+            opacity: 1;
+        }
+
+        .progress-bar {
+            flex-grow: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            margin: 0 10px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .progress {
+            position: absolute;
+            height: 100%;
+            background: var(--netflix-red);
+            width: 30%;
+        }
+
+        /* Categoria badges */
+
+        .category-badge {
+            background: var(--netflix-red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="netflix-navbar fixed w-full z-50 py-4 px-6" id="navbar">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <div class="flex items-center">
+                <span class="netflix-logo">
+          FASTPLAYER
+        </span>
+            </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#inicio" class="text-gray-300 hover:text-white transition duration-300">Início</a>
+                <a href="#beneficios" class="text-gray-300 hover:text-white transition duration-300">Benefícios</a>
+                <a href="#conteudo" class="text-gray-300 hover:text-white transition duration-300">Conteúdo</a>
+                <a href="#depoimentos" class="text-gray-300 hover:text-white transition duration-300">Depoimentos</a>
+                <a href="#planos" class="text-gray-300 hover:text-white transition duration-300">Planos</a>
+            </div>
+            <div class="hidden md:block">
+                <a href="https://bit.ly/4kjYh5g" class="action-button flex items-center" onclick="window.open('https://bit.ly/4kjYh5g', '_blank')">
+          <i class="fab fa-whatsapp mr-2"></i> Fale Conosco
+        </a>
+            </div>
+            <div class="md:hidden">
+                <button id="mobileMenuButton" class="text-white">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="hero-gradient flex flex-col justify-center items-center min-h-screen px-4 text-center pt-20">
+        <div class="max-w-4xl mx-auto">
+            <div class="mb-6">
+                <h1 class="text-4xl md:text-6xl font-bold mb-4">
+                    <span class="text-red-600">FAST</span><span class="text-white">PLAYER</span>
+                </h1>
+                <h2 class="text-xl md:text-2xl text-white mb-6">Sua plataforma de streaming completa</h2>
+                <p class="text-gray-300 mb-8 max-w-2xl mx-auto">
+                    Filmes, séries, canais ao vivo, futebol, desenhos e muito mais. Tudo em um só lugar, com qualidade e sem travar!
+                </p>
+            </div>
+
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+                <a href="https://bit.ly/4kjYh5g" class="action-button flex items-center" onclick="window.open('https://bit.ly/4kjYh5g', '_blank')">
+          <i class="fab fa-whatsapp mr-2"></i> ATIVE AGORA MESMO
+        </a>
+                <a href="https://bit.ly/4kjYh5g" class="secondary-button" onclick="window.open('https://bit.ly/4kjYh5g', '_blank')">
+          TESTE GRÁTIS
+        </a>
+            </div>
+
+            <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-3xl mx-auto">
+                <div class="text-center">
+                    <div id="channelsCounter" class="counter">0</div>
+                    <p class="text-gray-400">Canais</p>
+                </div>
+                <div class="text-center">
+                    <div id="moviesCounter" class="counter">0</div>
+                    <p class="text-gray-400">Filmes</p>
+                </div>
+                <div class="text-center">
+                    <div id="seriesCounter" class="counter">0</div>
+                    <p class="text-gray-400">Séries</p>
+                </div>
+                <div class="text-center">
+                    <div id="usersCounter" class="counter">0</div>
+                    <p class="text-gray-400">Usuários</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefícios -->
+    <section id="beneficios" class="bg-black py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">Por que escolher o <span class="text-red-600">FAST</span>PLAYER?</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">Descubra por que milhares de clientes escolhem nossa plataforma.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="feature-card">
+                    <div class="video-container">
+                        <video poster="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iMzYwIiB2aWV3Qm94PSIwIDAgNjQwIDM2MCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzE0MTQxNCIvPjx0ZXh0IHg9IjMyMCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGFsaWdubWVudC1iYXNlbGluZT0ibWlkZGxlIj5GaWxtZXM8L3RleHQ+PC9zdmc+"
+                            controls muted>
+              <source src="https://www.dropbox.com/scl/fi/a99xzf8bq7phc0bbtjjjk/Superman-l-Trailer-Dublado.mp4?rlkey=py6eh9d36qguwyzcwqru8oynh&raw=1" type="video/mp4">
+              Seu navegador não suporta vídeos HTML5.
+            </video>
+                        <div class="video-overlay">
+                            <h4 class="text-lg font-bold">Filmes</h4>
+                            <p class="text-sm text-gray-300">Os melhores lançamentos e clássicos</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="text-lg text-white font-bold mb-2">Filmes</h4>
+                        <p class="text-gray-400">Acesso a um catálogo completo com os últimos lançamentos e clássicos do cinema.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="video-container">
+                        <video poster="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iMzYwIiB2aWV3Qm94PSIwIDAgNjQwIDM2MCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzE0MTQxNCIvPjx0ZXh0IHg9IjMyMCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGFsaWdubWVudC1iYXNlbGluZT0ibWlkZGxlIj5DYW5haXMgRXNwb3J0aXZvczwvdGV4dD48L3N2Zz4="
+                            controls muted>
+              <source src="https://www.dropbox.com/scl/fi/1kgn4fetsj0kqpc5bi42t/MELHORES-MOMENTOS-FURIA-5-2-X-1-5-DENDELE-FC-FINAL-DA-KINGS-LEAGUE-BRASIL.mp4?rlkey=8coh5xopubvz965o7cbvx5izm&raw=1" type="video/mp4">
+              Seu navegador não suporta vídeos HTML5.
+            </video>
+                        <div class="video-overlay">
+                            <h4 class="text-lg font-bold">Canais Esportivos</h4>
+                            <p class="text-sm text-gray-300">Todos os jogos e campeonatos</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="text-lg text-white font-bold mb-2">Canais Esportivos</h4>
+                        <p class="text-gray-400">Assista aos principais campeonatos de futebol e outros esportes em tempo real.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="video-container">
+                        <video poster="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI2NDAiIGhlaWdodD0iMzYwIiB2aWV3Qm94PSIwIDAgNjQwIDM2MCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzE0MTQxNCIvPjx0ZXh0IHg9IjMyMCIgeT0iMTgwIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNmZmZmZmYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGFsaWdubWVudC1iYXNlbGluZT0ibWlkZGxlIj5Tw6lyaWVzPC90ZXh0Pjwvc3ZnPg=="
+                            controls muted>
+              <source src="https://www.dropbox.com/scl/fi/jx9vhwlvncjv0ephuwtso/The-Big-Bang-Theory-12x24-Cena-Final-Parte-1-Discurso-Do-Pr-mio-Nobel-Do-Sheldon-Dublado-HD.mp4?rlkey=xfv9vdz1ip1gupsvfrpexg6ea&raw=1" type="video/mp4">
+              Seu navegador não suporta vídeos HTML5.
+            </video>
+                        <div class="video-overlay">
+                            <h4 class="text-lg font-bold">Séries</h4>
+                            <p class="text-sm text-gray-300">As melhores séries nacionais e internacionais</p>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <h4 class="text-lg text-white font-bold mb-2">Séries</h4>
+                        <p class="text-gray-400">Assista às suas séries favoritas com episódios atualizados semanalmente.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 mt-8">
+                <div class="feature-card p-6">
+                    <div class="w-12 h-12 bg-red-600 bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-tv text-xl text-red-600"></i>
+                    </div>
+                    <h4 class="text-lg text-white font-bold mb-2">Multiplataforma</h4>
+                    <p class="text-gray-400">Assista em qualquer dispositivo: Smart TV, smartphone, tablet, computador ou TV Box.</p>
+                </div>
+
+                <div class="feature-card p-6">
+                    <div class="w-12 h-12 bg-red-600 bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-tachometer-alt text-xl text-red-600"></i>
+                    </div>
+                    <h4 class="text-lg text-white font-bold mb-2">Alta Qualidade</h4>
+                    <p class="text-gray-400">Transmissão estável e sem travamentos, com imagem em HD e Full HD.</p>
+                </div>
+
+                <div class="feature-card p-6">
+                    <div class="w-12 h-12 bg-red-600 bg-opacity-20 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-xl text-red-600"></i>
+                    </div>
+                    <h4 class="text-lg text-white font-bold mb-2">2 Telas Simultâneas</h4>
+                    <p class="text-gray-400">Compartilhe sua conta e assista em dois dispositivos ao mesmo tempo.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conteúdo -->
+    <section id="conteudo" class="bg-black py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">Conteúdo Disponível</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">Explore nossa vasta biblioteca de conteúdo para toda a família.</p>
+            </div>
+
+            <!-- Canais de TV -->
+            <div class="content-row">
+                <h4 class="content-row-title">Canais de TV</h4>
+                <div class="channel-grid">
+                    <!-- Globo -->
+                    <div class="channel-item">
+                        <div class="channel-logo">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" fill="#0066B3"/>
+                <circle cx="50" cy="50" r="25" fill="#FFFFFF"/>
+              </svg>
+                        </div>
+                        <span class="text-white text-sm">Globo</span>
+                    </div>
+
+                    <!-- SBT -->
+                    <div class="channel-item">
+                        <div class="channel-logo">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" fill="#E30613"/>
+                <text x="50" y="65" font-family="Arial" font-size="40" font-weight="bold" fill="white" text-anchor="middle">SBT</text>
+              </svg>
+                        </div>
+                        <span class="text-white text-sm">SBT</span>
+                    </div>
+
+                    <!-- Record -->
+                    <div class="channel-item">
+                        <div class="channel-logo">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" fill="#E30613"/>
+                <text x="50" y="65" font-family="Arial" font-size="20" font-weight="bold" fill="white" text-anchor="middle">RECORD</text>
+              </svg>
+                        </div>
+                        <span class="text-white text-sm">Record</span>
+                    </div>
+
+                    <!-- Band -->
+                    <div class="channel-item">
+                        <div class="channel-logo">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" fill="#009846"/>
+                <text x="50" y="65" font-family="Arial" font-size="20" font-weight="bold" fill="white" text-anchor="middle">BAND</text>
+              </svg>
+                        </div>
+                        <span class="text-white text-sm">Band</span>
+                    </div>
+
+                    <!-- ESPN -->
+                    <div class="channel-item">
+                        <div class="channel-logo">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" fill="#CF0A2C"/>
+                <text x="50" y="65" font-family="Arial" font-size="20" font-weight="bold" fill="white" text-anchor="middle">ESPN</text>
+              </svg>
+                        </div>
+                        <span class="text-white text-sm">ESPN</span>
+                    </div>
+
+                    <!-- HBO -->
+                    <div class="channel-item">
+                        <div class="channel-logo">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" fill="#000000"/>
+                <text x="50" y="65" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">HBO</text>
+              </svg>
+                        </div>
+                        <span class="text-white text-sm">HBO</span>
+                    </div>
+
+                    <!-- TNT -->
+                    <div class="channel-item">
+                        <div class="channel-logo">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" fill="#000000"/>
+                <text x="50" y="65" font-family="Arial" font-size="30" font-weight="bold" fill="white" text-anchor="middle">TNT</text>
+              </svg>
+                        </div>
+                        <span class="text-white text-sm">TNT</span>
+                    </div>
+
+                    <!-- Discovery -->
+                    <div class="channel-item">
+                        <div class="channel-logo">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="50" r="45" fill="#000000"/>
+                <text x="50" y="55" font-family="Arial" font-size="12" font-weight="bold" fill="white" text-anchor="middle">DISCOVERY</text>
+              </svg>
+                        </div>
+                        <span class="text-white text-sm">Discovery</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categorias -->
+            <div class="grid md:grid-cols-4 gap-6 mt-12">
+                <div class="feature-card p-6 text-center">
+                    <div class="w-16 h-16 bg-red-600 bg-opacity-20 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-futbol text-2xl text-red-600"></i>
+                    </div>
+                    <h4 class="text-lg text-white font-bold mb-2">Esportes</h4>
+                    <p class="text-gray-400">Futebol, UFC, Fórmula 1, NBA e muito mais.</p>
+                </div>
+
+                <div class="feature-card p-6 text-center">
+                    <div class="w-16 h-16 bg-red-600 bg-opacity-20 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-child text-2xl text-red-600"></i>
+                    </div>
+                    <h4 class="text-lg text-white font-bold mb-2">Infantil</h4>
+                    <p class="text-gray-400">Desenhos, filmes e séries para crianças.</p>
+                </div>
+
+                <div class="feature-card p-6 text-center">
+                    <div class="w-16 h-16 bg-red-600 bg-opacity-20 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-newspaper text-2xl text-red-600"></i>
+                    </div>
+                    <h4 class="text-lg text-white font-bold mb-2">Notícias</h4>
+                    <p class="text-gray-400">Canais de notícias 24 horas por dia.</p>
+                </div>
+
+                <div class="feature-card p-6 text-center">
+                    <div class="w-16 h-16 bg-red-600 bg-opacity-20 rounded-full flex items-center justify-center mb-4 mx-auto">
+                        <i class="fas fa-globe text-2xl text-red-600"></i>
+                    </div>
+                    <h4 class="text-lg text-white font-bold mb-2">Internacional</h4>
+                    <p class="text-gray-400">Canais de diversos países e idiomas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Depoimentos -->
+    <section id="depoimentos" class="bg-black py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">O que nossos clientes dizem</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">Veja a opinião de quem já utiliza o FASTPLAYER.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Depoimento 1 -->
+                <div class="testimonial-card">
+                    <div class="flex items-center mb-4">
+                        <div class="testimonial-avatar">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="40" r="25" fill="#888888" />
+                <circle cx="50" cy="100" r="50" fill="#888888" />
+              </svg>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-bold">Carlos Silva</h4>
+                            <p class="text-gray-400 text-sm">Cliente há 8 meses</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">"Estou impressionado com a qualidade do serviço. Nunca mais tive problemas com travamentos durante os jogos de futebol. A imagem é excelente e o suporte responde rapidamente quando preciso."</p>
+                    <div class="flex">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                </div>
+
+                <!-- Depoimento 2 -->
+                <div class="testimonial-card">
+                    <div class="flex items-center mb-4">
+                        <div class="testimonial-avatar">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="40" r="25" fill="#888888" />
+                <circle cx="50" cy="100" r="50" fill="#888888" />
+              </svg>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-bold">Ana Oliveira</h4>
+                            <p class="text-gray-400 text-sm">Cliente há 1 ano</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">"Minha família inteira adora o FASTPLAYER. Eu assisto minhas séries, meu marido os jogos e meus filhos os desenhos. Tudo funciona perfeitamente em qualquer dispositivo. Vale muito a pena!"</p>
+                    <div class="flex">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                </div>
+
+                <!-- Depoimento 3 -->
+                <div class="testimonial-card">
+                    <div class="flex items-center mb-4">
+                        <div class="testimonial-avatar">
+                            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="50" cy="40" r="25" fill="#888888" />
+                <circle cx="50" cy="100" r="50" fill="#888888" />
+              </svg>
+                        </div>
+                        <div>
+                            <h4 class="text-white font-bold">Marcos Santos</h4>
+                            <p class="text-gray-400 text-sm">Cliente há 6 meses</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">"Já testei várias plataformas de IPTV e o FASTPLAYER é disparado o melhor. Canais estáveis, catálogo sempre atualizado e preço justo. Recomendo para todos os meus amigos!"</p>
+                    <div class="flex">
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                        <i class="fas fa-star text-yellow-400"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Planos -->
+    <section id="planos" class="bg-black py-16 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">Nossos Planos</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">Escolha o plano ideal para você e sua família.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Plano Mensal -->
+                <div class="pricing-card">
+                    <div class="p-6 border-b border-gray-800">
+                        <h4 class="text-xl font-bold text-white mb-2">Plano Mensal</h4>
+                        <div class="text-3xl font-bold text-white">R$29<span class="text-sm font-normal text-gray-400">/mês</span></div>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">Acesso a todos os canais</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">Filmes e séries on demand</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">2 telas simultâneas</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">Suporte 24/7</span>
+                            </li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="https://bit.ly/4kjYh5g" class="action-button w-full block text-center" onclick="window.open('https://bit.ly/4kjYh5g', '_blank')">Assinar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plano Trimestral -->
+                <div class="pricing-card popular">
+                    <div class="p-2 bg-red-600 text-white text-center text-sm font-bold">
+                        MAIS POPULAR
+                    </div>
+                    <div class="p-6 border-b border-gray-800">
+                        <h4 class="text-xl font-bold text-white mb-2">Plano Trimestral</h4>
+                        <div class="text-3xl font-bold text-white">R$65<span class="text-sm font-normal text-gray-400">/3 meses</span></div>
+                        <p class="text-sm text-red-600 mt-1">Economize R$22</p>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">Acesso a todos os canais</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">Filmes e séries on demand</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">2 telas simultâneas</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">Suporte 24/7</span>
+                            </li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="https://bit.ly/4kjYh5g" class="action-button w-full block text-center" onclick="window.open('https://bit.ly/4kjYh5g', '_blank')">Assinar</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plano Semestral -->
+                <div class="pricing-card">
+                    <div class="p-6 border-b border-gray-800">
+                        <h4 class="text-xl font-bold text-white mb-2">Plano Semestral</h4>
+                        <div class="text-3xl font-bold text-white">R$99<span class="text-sm font-normal text-gray-400">/6 meses</span></div>
+                        <p class="text-sm text-red-600 mt-1">Economize R$75</p>
+                    </div>
+                    <div class="p-6">
+                        <ul class="space-y-3">
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">Acesso a todos os canais</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">Filmes e séries on demand</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">2 telas simultâneas</span>
+                            </li>
+                            <li class="flex items-center">
+                                <i class="fas fa-check text-red-600 mr-2"></i>
+                                <span class="text-gray-300">Suporte 24/7</span>
+                            </li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="https://bit.ly/4kjYh5g" class="action-button w-full block text-center" onclick="window.open('https://bit.ly/4kjYh5g', '_blank')">Assinar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-8">
+                <p class="text-gray-400 mb-4">Não tem certeza? Experimente antes de assinar!</p>
+                <a href="https://bit.ly/4kjYh5g" class="secondary-button" onclick="window.open('https://bit.ly/4kjYh5g', '_blank')">
+          TESTE GRÁTIS
+        </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="bg-black py-16 px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h3 class="text-2xl md:text-3xl font-bold text-white mb-4">Perguntas Frequentes</h3>
+                <p class="text-gray-400 max-w-2xl mx-auto">Tire suas dúvidas sobre o FASTPLAYER.</p>
+            </div>
+
+            <div class="space-y-4">
+                <div class="feature-card p-4">
+                    <button class="flex justify-between items-center w-full text-left" onclick="toggleFAQ(this)">
+            <h4 class="text-lg text-white font-bold">Como funciona o FASTPLAYER?</h4>
+            <i class="fas fa-chevron-down text-red-600"></i>
+          </button>
+                    <div class="faq-answer hidden mt-2">
+                        <p class="text-gray-400">O FASTPLAYER é uma plataforma de IPTV que transmite conteúdo via internet. Você pode acessar através de aplicativos em Smart TVs, smartphones, tablets, computadores ou TV Box.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card p-4">
+                    <button class="flex justify-between items-center w-full text-left" onclick="toggleFAQ(this)">
+            <h4 class="text-lg text-white font-bold">Preciso de internet rápida?</h4>
+            <i class="fas fa-chevron-down text-red-600"></i>
+          </button>
+                    <div class="faq-answer hidden mt-2">
+                        <p class="text-gray-400">Recomendamos uma conexão de pelo menos 10 Mbps para uma experiência sem travamentos. Para conteúdo em Full HD, o ideal é ter 15 Mbps ou mais.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card p-4">
+                    <button class="flex justify-between items-center w-full text-left" onclick="toggleFAQ(this)">
+            <h4 class="text-lg text-white font-bold">Posso assistir em mais de um dispositivo?</h4>
+            <i class="fas fa-chevron-down text-red-600"></i>
+          </button>
+                    <div class="faq-answer hidden mt-2">
+                        <p class="text-gray-400">Sim, todos os nossos planos permitem o uso em até 2 telas simultâneas, podendo ser em dispositivos diferentes e em locais diferentes.</p>
+                    </div>
+                </div>
+
+                <div class="feature-card p-4">
+                    <button class="flex justify-between items-center w-full text-left" onclick="toggleFAQ(this)">
+            <h4 class="text-lg text-white font-bold">Como faço para testar antes de assinar?</h4>
+            <i class="fas fa-chevron-down text-red-600"></i>
+          </button>
+                    <div class="faq-answer hidden mt-2">
+                        <p class="text-gray-400">Entre em contato conosco pelo WhatsApp e solicite seu teste grátis. Você terá acesso a todos os recursos por um período limitado para conhecer nossa plataforma.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="bg-gradient-to-b from-black to-gray-900 py-16 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h3 class="text-2xl md:text-3xl font-bold text-white mb-6">Pronto para começar?</h3>
+            <p class="text-gray-400 mb-8">Entre em contato agora mesmo e tenha acesso ao melhor conteúdo.</p>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4">
+                <a href="https://bit.ly/4kjYh5g" class="action-button flex items-center justify-center" onclick="window.open('https://bit.ly/4kjYh5g', '_blank')">
+          <i class="fab fa-whatsapp mr-2"></i> FALE CONOSCO PELO WHATSAPP
+        </a>
+                <a href="https://bit.ly/4kjYh5g" class="secondary-button" onclick="window.open('https://bit.ly/4kjYh5g', '_blank')">
+          TESTE GRÁTIS
+        </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-8 px-4 border-t border-gray-800">
+        <div class="max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <span class="netflix-logo">
+            FASTPLAYER
+          </span>
+                </div>
+                <div class="text-gray-400 text-sm">
+                    &copy; 2023 FASTPLAYER. Todos os direitos reservados.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Garantir que todos os links abram em uma nova aba
+        document.addEventListener('DOMContentLoaded', function() {
+            // Seleciona todos os links com href específico
+            const allLinks = document.querySelectorAll('a[href="https://bit.ly/4kjYh5g"]');
+
+            // Adiciona evento de clique para cada link
+            allLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.open('https://bit.ly/4kjYh5g', '_blank');
+                });
+            });
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        document.getElementById('mobileMenuButton').addEventListener('click', function() {
+            alert('Menu mobile em desenvolvimento');
+        });
+
+        // Animação de contador
+        function animateCounter(elementId, finalValue, duration) {
+            const element = document.getElementById(elementId);
+            const startTime = performance.now();
+            const startValue = 0;
+
+            function updateCounter(currentTime) {
+                const elapsedTime = currentTime - startTime;
+                const progress = Math.min(elapsedTime / duration, 1);
+
+                const currentValue = Math.floor(startValue + progress * (finalValue - startValue));
+                element.textContent = currentValue.toLocaleString();
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                }
+            }
+
+            requestAnimationFrame(updateCounter);
+        }
+
+        // Função para verificar se um elemento está visível na viewport
+        function isElementInViewport(el) {
+            const rect = el.getBoundingClientRect();
+            return (
+                rect.top >= 0 &&
+                rect.left >= 0 &&
+                rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+                rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+            );
+        }
+
+        // Iniciar animação dos contadores quando estiverem visíveis
+        function handleScroll() {
+            const countersSection = document.getElementById('channelsCounter').parentElement.parentElement.parentElement;
+
+            if (isElementInViewport(countersSection) && !countersSection.classList.contains('animated')) {
+                countersSection.classList.add('animated');
+
+                // Iniciar animação dos contadores com valores diferentes
+                animateCounter('channelsCounter', 500, 2000);
+                animateCounter('moviesCounter', 10000, 2000);
+                animateCounter('seriesCounter', 2500, 2000);
+                animateCounter('usersCounter', 50000, 2000);
+            }
+        }
+
+        // Toggle FAQ answers
+        function toggleFAQ(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('i');
+
+            if (answer.classList.contains('hidden')) {
+                answer.classList.remove('hidden');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                answer.classList.add('hidden');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        }
+
+        // Adicionar listener de scroll
+        window.addEventListener('scroll', handleScroll);
+        window.addEventListener('load', function() {
+            handleScroll();
+
+            // Iniciar vídeos com um pequeno atraso para melhorar o carregamento da página
+            setTimeout(function() {
+                document.querySelectorAll('video').forEach(video => {
+                    video.play().catch(e => {
+                        console.log('Auto-play foi bloqueado pelo navegador. O usuário precisa interagir com a página primeiro.');
+                    });
+                });
+            }, 1000);
+        });
+    </script>
+    <script>
+        (function() {
+            function c() {
+                var b = a.contentDocument || a.contentWindow.document;
+                if (b) {
+                    var d = b.createElement('script');
+                    d.innerHTML = "window.__CF$cv$params={r:'9436ad87a108007b',t:'MTc0Nzg1NzgxMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";
+                    b.getElementsByTagName('head')[0].appendChild(d)
+                }
+            }
+            if (document.body) {
+                var a = document.createElement('iframe');
+                a.height = 1;
+                a.width = 1;
+                a.style.position = 'absolute';
+                a.style.top = 0;
+                a.style.left = 0;
+                a.style.border = 'none';
+                a.style.visibility = 'hidden';
+                document.body.appendChild(a);
+                if ('loading' !== document.readyState) c();
+                else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c);
+                else {
+                    var e = document.onreadystatechange || function() {};
+                    document.onreadystatechange = function(b) {
+                        e(b);
+                        'loading' !== document.readyState && (document.onreadystatechange = e, c())
+                    }
+                }
+            }
+        })();
+    </script>
+</body>
+
+</html>
